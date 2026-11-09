@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="smart_storage_rack">
+    <static>true</static>
+    <link name="rack_link">
+      <!-- 1. Main Rack Steel Structure & Rails with Sensor Plugins -->
+      <visual name="rack_structure_visual">
+        <geometry>
+          <mesh>
+            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/smart_storage_rack_visual.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>0.22 0.25 0.30 1.0</diffuse>
+          <ambient>0.22 0.25 0.30 1.0</ambient>
+          <specular>0.4 0.4 0.4 1.0</specular>
+        </material>
+      </visual>
+
+      <!-- 2. Level 1 Tray resting on lower rails (Z = 0.465 m) -->
+      <visual name="tray_1_body_visual">
+        <pose>0 0 0.465 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/payload_tray_visual.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>0.72 0.52 0.32 1.0</diffuse>
+          <ambient>0.72 0.52 0.32 1.0</ambient>
+        </material>
+      </visual>
+      <visual name="tray_1_weights_visual">
+        <pose>0 0 0.465 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/payload_weights_visual.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>0.62 0.65 0.70 1.0</diffuse>
+          <ambient>0.62 0.65 0.70 1.0</ambient>
+          <specular>0.6 0.6 0.6 1.0</specular>
+        </material>
+      </visual>
+
+      <!-- 3. Level 2 Tray resting on upper rails (Z = 0.600 m) -->
+      <visual name="tray_2_body_visual">
+        <pose>0 0 0.600 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/payload_tray_visual.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>0.52 0.65 0.82 1.0</diffuse>
+          <ambient>0.52 0.65 0.82 1.0</ambient>
+        </material>
+      </visual>
+      <visual name="tray_2_weights_visual">
+        <pose>0 0 0.600 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/payload_weights_visual.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>0.62 0.65 0.70 1.0</diffuse>
+          <ambient>0.62 0.65 0.70 1.0</ambient>
+          <specular>0.6 0.6 0.6 1.0</specular>
+        </material>
+      </visual>
+
+      <!-- Four vertical corner post collisions (clear drive-in tunnel) -->
+      <collision name="post_fl_collision">
+        <pose>0.460 0.440 0.410 0 0 0</pose>
+        <geometry><box><size>0.040 0.040 0.820</size></box></geometry>
+      </collision>
+      <collision name="post_fr_collision">
+        <pose>0.460 -0.440 0.410 0 0 0</pose>
+        <geometry><box><size>0.040 0.040 0.820</size></box></geometry>
+      </collision>
+      <collision name="post_rl_collision">
+        <pose>-0.460 0.440 0.410 0 0 0</pose>
+        <geometry><box><size>0.040 0.040 0.820</size></box></geometry>
+      </collision>
+      <collision name="post_rr_collision">
+        <pose>-0.460 -0.440 0.410 0 0 0</pose>
+        <geometry><box><size>0.040 0.040 0.820</size></box></geometry>
+      </collision>
+
+      <!-- Rear backstop floor beam collision -->
+      <collision name="rear_backstop_collision">
+        <pose>0.460 0 0.020 0 0 0</pose>
+        <geometry><box><size>0.040 0.920 0.040</size></box></geometry>
+      </collision>
+
+      <!-- Level 1 left/right support rail collisions (Z = 0.477 m) -->
+      <collision name="level_1_rail_left">
+        <pose>0 0.330 0.477 0 0 0</pose>
+        <geometry><box><size>0.520 0.056 0.016</size></box></geometry>
+      </collision>
+      <collision name="level_1_rail_right">
+        <pose>0 -0.330 0.477 0 0 0</pose>
+        <geometry><box><size>0.520 0.056 0.016</size></box></geometry>
+      </collision>
+
+      <!-- Level 2 left/right support rail collisions (Z = 0.612 m) -->
+      <collision name="level_2_rail_left">
+        <pose>0 0.330 0.612 0 0 0</pose>
+        <geometry><box><size>0.520 0.056 0.016</size></box></geometry>
+      </collision>
+      <collision name="level_2_rail_right">
+        <pose>0 -0.330 0.612 0 0 0</pose>
+        <geometry><box><size>0.520 0.056 0.016</size></box></geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="charging_station">
+    <static>true</static>
+    <link name="charging_station_link">
+      <visual name="charging_station_visual">
+        <geometry>
+          <mesh>
+            <uri>model://factory_delivery_amr_description/models/charging_station/meshes/charging_station_visual.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>0.24 0.28 0.35 1.0</diffuse>
+          <ambient>0.24 0.28 0.35 1.0</ambient>
+          <specular>0.3 0.3 0.3 1.0</specular>
+        </material>
+      </visual>
+
+      <collision name="cabinet_collision">
+        <pose>0.165 0 0.330 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.160 0.380 0.596</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="base_collision">
+        <pose>0.135 0 0.008 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.290 0.540 0.016</size>
+          </box>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>
