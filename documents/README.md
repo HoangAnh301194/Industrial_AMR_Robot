@@ -119,11 +119,11 @@ Hệ thống được tổ chức theo các tầng chức năng, từ tầng qu�
 ```mermaid
 flowchart TB
     A["NHIỆM VỤ / MISSION MANAGER"]
-    B["ĐỊNH VỊ & NHẬN THỨC"]
+    B["ĐỊNH VỊ và NHẬN THỨC"]
     C["ĐIỀU HƯỚNG / PATH PLANNING"]
     D["ĐIỀU KHIỂN CHUYỂN ĐỘNG"]
     E["DRIVER ĐỘNG CƠ"]
-    F["MOTOR & BÁNH XE"]
+    F["MOTOR và BÁNH XE"]
 
     S["LiDAR / Camera / IMU / Encoder"]
     P["PIN / BMS / NGUỒN"]
