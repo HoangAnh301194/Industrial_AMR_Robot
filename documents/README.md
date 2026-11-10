@@ -113,8 +113,52 @@ Hệ thống được tổ chức theo các tầng chức năng, từ tầng qu�
 - Khung cơ khí và bánh xe.
 - Động cơ và driver.
 - LiDAR, camera, IMU.
+
+## 5. Sơ đồ khối hệ thống (System Block Diagram)
+
+```mermaid
+flowchart TB
+    A["NHIỆM VỤ / MISSION MANAGER"]
+    B["ĐỊNH VỊ & NHẬN THỨC"]
+    C["ĐIỀU HƯỚNG / PATH PLANNING"]
+    D["ĐIỀU KHIỂN CHUYỂN ĐỘNG"]
+    E["DRIVER ĐỘNG CƠ"]
+    F["MOTOR & BÁNH XE"]
+
+    S["LiDAR / Camera / IMU / Encoder"]
+    P["PIN / BMS / NGUỒN"]
+    SAFE["SAFETY SYSTEM / EMERGENCY STOP"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+
+    S --> B
+    F --> S
+    P --> A
+    P --> D
+    SAFE --> D
+    SAFE --> E
+```
 - Encoder.
 - SBC/Jetson và MCU.
 - Pin, BMS và hệ thống sạc.
 - Mạch an toàn.
 
+## 6. Phân rã module hệ thống
+
+| Module | Thành phần chính | Chức năng |
+|---|---|---|
+| M1 – Mechanical | Khung xe, bánh xe, giá đỡ khay | Kết cấu và chịu tải |
+| M2 – Drive System | Motor, gearbox, driver | Tạo chuyển động |
+| M3 – Sensor System | LiDAR, Camera, IMU, Encoder | Thu thập dữ liệu môi trường và trạng thái |
+| M4 – Localization | SLAM, Sensor Fusion | Xác định vị trí và tư thế robot |
+| M5 – Navigation | Global Planner, Local Planner | Lập kế hoạch và điều hướng |
+| M6 – Obstacle Avoidance | LiDAR, Camera, thuật toán tránh vật cản | Phát hiện và xử lý vật cản |
+| M7 – Control System | MCU, PID, motor control | Điều khiển chuyển động |
+| M8 – Power System | Battery, BMS, Charging | Quản lý năng lượng và sạc |
+| M9 – Mission Management | Task Manager, State Machine | Quản lý nhiệm vụ và trạng thái |
+| M10 – Safety System | Emergency Stop, Safety Sensor | Đảm bảo an toàn |
+| M11 – Communication | CAN, UART, Ethernet/Wi-Fi | Trao đổi dữ liệu giữa các phân hệ |
