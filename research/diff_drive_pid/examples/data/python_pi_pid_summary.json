@@ -1,0 +1,11 @@
+{
+  "warning": "Illustrative Python cross-check only, NOT MATLAB/Gazebo/hardware result",
+  "Kp": 1.1,
+  "Ki": 3.0,
+  "Kd": 0.02,
+  "derivative_filter_seconds": 0.04,
+  "torque_limit_Nm_at_wheel_assumed": 8.0,
+  "RMSE_PI_mps": 0.21092384307329146,
+  "RMSE_PID_mps": 0.2167824847074514,
+  "max_absolute_PI_minus_PID_speed_mps": 0.02344401035296123
+}

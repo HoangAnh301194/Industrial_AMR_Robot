@@ -1,0 +1,65 @@
+{
+  "warning": "ILLUSTRATIVE PYTHON SIMULATION ONLY; no Gazebo/ROS/hardware verification",
+  "parameters": {
+    "wheel_radius_m": 0.08,
+    "wheel_separation_m": 0.45,
+    "total_mass_kg": 75.0,
+    "I_z_kgm2": 4.953125,
+    "wheel_inertia_kgm2": 0.012,
+    "rolling_resistance": 0.025,
+    "viscous_Nm_s_per_rad": 0.015,
+    "torque_limit_Nm_per_wheel": 8.0,
+    "kp_Nm_per_rad_s": 1.1,
+    "ki_Nm_per_rad": 3.0,
+    "time_step_s": 0.005
+  },
+  "maneuver": {
+    "max_wheel_speed_error_rps": 10.571832539183582,
+    "total_path_distance_m": 2.882212612186328,
+    "final_pose_m_rad": [
+      1.8679,
+      1.37125,
+      1.11715
+    ]
+  },
+  "waypoint": {
+    "simulated_points": {
+      "A": [
+        0.0,
+        0.0
+      ],
+      "B": [
+        3.0,
+        0.0
+      ],
+      "C": [
+        3.0,
+        2.0
+      ],
+      "D": [
+        6.0,
+        2.0
+      ]
+    },
+    "events": [
+      {
+        "time_s": 4.94,
+        "point": "B",
+        "distance_at_switch_m": 0.1198
+      },
+      {
+        "time_s": 9.56,
+        "point": "C",
+        "distance_at_switch_m": 0.11954
+      },
+      {
+        "time_s": 15.745,
+        "point": "D",
+        "distance_at_switch_m": 0.11975
+      }
+    ],
+    "completed_all": true,
+    "end_time_s": 15.745,
+    "note": "Tolerance 0.12m only indicates illustrative switch criterion; it does NOT prove docking accuracy 30mm"
+  }
+}

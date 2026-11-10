@@ -246,6 +246,18 @@ Script [`../examples/simulate_diff_drive_pi.py`](../examples/simulate_diff_drive
 
 Đã chạy kiểm tra số: động học thuận/nghịch cho ra lại $(v,\omega)$ đã đặt; mô hình tốc độ duy trì trung bình khoảng **1,196 m/s** trong đoạn giữ lệnh 1,2 m/s; đầu ra mô-men không vượt ngưỡng bão hòa **giả định** 8 N·m. Kết quả này chỉ chứng minh script hoạt động theo mô hình đơn giản, **không chứng minh** yêu cầu khách hàng đã đạt, đặc biệt là sai số docking, an toàn tránh người, quãng đường thực và thời gian pin 4 giờ.
 
+## 4.5. Đồ thị mô phỏng số mở rộng và dữ liệu tái lập
+
+Ngoài bài thử tăng tốc–giữ tốc–giảm tốc ở §4.4, nhóm bổ sung một loạt kịch bản minh họa **khác** trong script [`../examples/simulate_extended_plots.py`](../examples/simulate_extended_plots.py): đi thẳng rồi vào cua, quay tại chỗ, so sánh P với PI dưới nhiễu tải giả định, và điều hướng đến bốn tọa độ giả định A→B→C→D. Kết quả có dữ liệu CSV đi kèm; tham số, giới hạn, ngưỡng đạt được ghi đầy đủ trong [`03_bieu_do_mo_phong_mo_rong.md`](03_bieu_do_mo_phong_mo_rong.md).
+
+![Bám tốc độ góc hai bánh trong nhiều chế độ chuyển động.](assets/extended_wheel_speed_tracking.png)
+
+![So sánh điều khiển P và PI có nhiễu tải mô phỏng.](assets/extended_p_vs_pi_disturbance.png)
+
+![Quỹ đạo minh họa nối điểm A → B → C → D bằng bộ điều khiển đơn giản trong Python.](assets/extended_waypoint_abcd.png)
+
+Các biểu đồ mới **không đo trên Gazebo, Nav2 hay robot thật**. Bộ điều khiển đi theo waypoint là phương pháp kiểm tra động học ở mức số, không phải chứng minh hệ robot đã chạy trong nhà máy. Chuyển waypoint khi khoảng cách còn < 0,12 m chỉ là ngưỡng mô phỏng, **không phải** minh chứng đạt sai số dừng 30 mm.
+
 # 5. Áp dụng vào ROS 2 Jazzy, Gazebo và mô hình URDF của nhóm
 
 ## 5.1. Các tham số phải kiểm tra thống nhất
