@@ -1427,6 +1427,27 @@ ros2 topic pub /amr_1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.5, y: 0.0,
 ros2 topic pub /amr_1/lift_position std_msgs/msg/Float64 "{data: 0.20}" --once
 ```
 
+#### Bước 6: Hướng dẫn quan sát trực quan 2 Robot trên RViz2
+
+Sau khi khởi chạy file hiển thị:
+```bash
+source install/setup.bash
+ros2 launch factory_delivery_amr_description rviz_sensors.launch.py
+```
+
+Cửa sổ **RViz2** sẽ hiển thị:
+1. **Khung nhìn chuẩn (`Fixed Frame: world`)**: Toàn bộ hệ tọa độ nhà kho được căn chỉnh với mặt sàn và 2 robot đặt song song tại $y = \pm 0.8\text{ m}$.
+2. **RobotModel 1 & 2**: Mô hình 3D chi tiết của cả 2 robot AMR (/amr_1 và /amr_2) di chuyển thời gian thực.
+3. **LaserScan 1 & 2**:
+   - `LaserScan 1 (/amr_1/scan)`: Tia quét 360 độ màu **Xanh lá cây** phản xạ trên tường kho và kệ hàng.
+   - `LaserScan 2 (/amr_2/scan)`: Tia quét 360 độ màu **Xanh Cyan** của robot thứ 2.
+4. **Odometry 1 & 2**: Mũi tên đỏ và xanh lam thể hiện vector vận tốc và quỹ đạo di chuyển của từng xe.
+5. **Thao tác chuột**:
+   - **Xoay 3D**: Giữ chuột trái và kéo.
+   - **Zoom**: Lăn con lăn chuột giữa (hoặc giữ chuột phải).
+   - **Pan (trượt)**: Giữ phím `Shift` + chuột trái (hoặc đè con lăn chuột).
+   - **Focus**: Bấm phím `F` trên bàn phím để căn giữa góc nhìn vào robot.
+
 ---
 
 ## TÓM TẮT CHECKLIST NHANH KHI CHẾ TẠO ROBOT OPENSCAD $\rightarrow$ URDF
