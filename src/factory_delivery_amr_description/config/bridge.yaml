@@ -70,6 +70,18 @@
   gz_type_name: "ignition.msgs.IMU"
   direction: GZ_TO_ROS
 
+- ros_topic_name: "/amr_1/joint_states"
+  gz_topic_name: "/amr_1/joint_states"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "ignition.msgs.Model"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/tf"
+  gz_topic_name: "/amr_1/tf"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "ignition.msgs.Pose_V"
+  direction: GZ_TO_ROS
+
 # ============================================================================
 # ROBOT 2 (amr_2) - DRIVE, ODOMETRY & LIFT CONTROLLERS
 # ============================================================================
@@ -133,6 +145,18 @@
   gz_type_name: "ignition.msgs.IMU"
   direction: GZ_TO_ROS
 
+- ros_topic_name: "/amr_2/joint_states"
+  gz_topic_name: "/amr_2/joint_states"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "ignition.msgs.Model"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/tf"
+  gz_topic_name: "/amr_2/tf"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "ignition.msgs.Pose_V"
+  direction: GZ_TO_ROS
+
 # ============================================================================
 # SINGLE ROBOT DEFAULT (TOPIC_PREFIX:="") - SENSORS & NAVIGATION
 # ============================================================================
@@ -146,4 +170,17 @@
   gz_topic_name: "/imu"
   ros_type_name: "sensor_msgs/msg/Imu"
   gz_type_name: "ignition.msgs.IMU"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/joint_states"
+  gz_topic_name: "/joint_states"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "ignition.msgs.Model"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/tf"
+  gz_topic_name: "/tf"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "ignition.msgs.Pose_V"
+  direction: GZ_TO_ROS
   direction: GZ_TO_ROS

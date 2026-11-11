@@ -1385,6 +1385,10 @@ ros2 launch factory_delivery_amr_description gazebo.launch.py
 # 3. Mở một Terminal khác (tại thư mục gốc) để điều khiển Robot di chuyển và nâng/hạ bàn nâng bằng bàn phím:
 source install/setup.bash
 ros2 run factory_delivery_amr_description amr_keyboard_teleop.py
+
+# 4. Mở RViz2 trực quan hóa toàn bộ cảm biến (Mô hình Robot 3D, tia quét 2D LiDAR, Odometry và trục tọa độ TF):
+source install/setup.bash
+ros2 launch factory_delivery_amr_description rviz_sensors.launch.py
 ```
 
 #### Bước 5: Kiểm tra và Test toàn bộ Topic Cảm biến & Điều khiển qua ROS 2 CLI
