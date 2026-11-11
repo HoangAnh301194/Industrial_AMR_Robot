@@ -6,7 +6,7 @@
       <visual name="charging_station_visual">
         <geometry>
           <mesh>
-            <uri>model://factory_delivery_amr_description/models/charging_station/meshes/charging_station_visual.stl</uri>
+            <uri>model://charging_station/meshes/charging_station_visual.stl</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>

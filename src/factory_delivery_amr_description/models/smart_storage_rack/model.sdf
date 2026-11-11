@@ -7,7 +7,7 @@
       <visual name="rack_structure_visual">
         <geometry>
           <mesh>
-            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/smart_storage_rack_visual.stl</uri>
+            <uri>model://smart_storage_rack/meshes/smart_storage_rack_visual.stl</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
@@ -23,7 +23,7 @@
         <pose>0 0 0.465 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/payload_tray_visual.stl</uri>
+            <uri>model://smart_storage_rack/meshes/payload_tray_visual.stl</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
@@ -36,7 +36,7 @@
         <pose>0 0 0.465 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/payload_weights_visual.stl</uri>
+            <uri>model://smart_storage_rack/meshes/payload_weights_visual.stl</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
@@ -52,7 +52,7 @@
         <pose>0 0 0.600 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/payload_tray_visual.stl</uri>
+            <uri>model://smart_storage_rack/meshes/payload_tray_visual.stl</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
@@ -65,7 +65,7 @@
         <pose>0 0 0.600 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://factory_delivery_amr_description/models/smart_storage_rack/meshes/payload_weights_visual.stl</uri>
+            <uri>model://smart_storage_rack/meshes/payload_weights_visual.stl</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>

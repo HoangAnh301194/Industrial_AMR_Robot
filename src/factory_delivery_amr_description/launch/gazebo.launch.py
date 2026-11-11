@@ -41,6 +41,10 @@ def generate_launch_description():
         name="GZ_SIM_RESOURCE_PATH",
         value=f"{models_dir}:{parent_share_dir}",
     )
+    set_sdf_path = AppendEnvironmentVariable(
+        name="SDF_PATH",
+        value=f"{models_dir}:{parent_share_dir}",
+    )
 
 
     # ========================================================================
@@ -265,6 +269,7 @@ def generate_launch_description():
         [
             set_ign_resource_path,
             set_gz_resource_path,
+            set_sdf_path,
             generate_urdf_1,
             generate_urdf_2,
             start_gazebo,

@@ -228,24 +228,60 @@
 
 
     <!-- ============================================================= -->
-    <!-- SMART TWO-LEVEL STORAGE RACK (Level 1: 0.485m, Level 2: 0.620m)-->
+    <!-- WAREHOUSE STRUCTURE & CORRIDORS                               -->
     <!-- ============================================================= -->
 
     <include>
-      <name>smart_storage_rack</name>
-      <uri>model://factory_delivery_amr_description/models/smart_storage_rack</uri>
-      <pose>2.5 0 0 0 0 0</pose>
+      <name>warehouse</name>
+      <uri>model://warehouse</uri>
+      <pose>0 0 -0.1 0 0 0</pose>
     </include>
 
 
     <!-- ============================================================= -->
-    <!-- INDUSTRIAL 48V AMR FAST-CHARGING STATION DOCK                 -->
+    <!-- INDUSTRIAL 48V AMR FAST-CHARGING STATION DOCKS (CHARGING ZONE)-->
     <!-- ============================================================= -->
 
     <include>
-      <name>charging_station</name>
-      <uri>model://factory_delivery_amr_description/models/charging_station</uri>
-      <pose>-2.5 0 0 0 0 0</pose>
+      <name>charging_dock_1</name>
+      <uri>model://charging_station</uri>
+      <pose>-3.5 1.5 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>charging_dock_2</name>
+      <uri>model://charging_station</uri>
+      <pose>-3.5 -1.5 0 0 0 0</pose>
+    </include>
+
+
+    <!-- ============================================================= -->
+    <!-- SMART TWO-LEVEL STORAGE RACKS (STORAGE AISLES)               -->
+    <!-- (Supports Level 1: 0.485 m and Level 2: 0.620 m pickup/place) -->
+    <!-- ============================================================= -->
+
+    <include>
+      <name>smart_rack_1</name>
+      <uri>model://smart_storage_rack</uri>
+      <pose>3.0 1.5 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>smart_rack_2</name>
+      <uri>model://smart_storage_rack</uri>
+      <pose>3.0 -1.5 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>smart_rack_3</name>
+      <uri>model://smart_storage_rack</uri>
+      <pose>6.0 1.5 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>smart_rack_4</name>
+      <uri>model://smart_storage_rack</uri>
+      <pose>6.0 -1.5 0 0 0 0</pose>
     </include>
 
   </world>
