@@ -10,8 +10,11 @@ Thư mục này bổ sung **mã MATLAB (.m) chạy mô phỏng số** cho dự �
 
 ## Chạy toàn bộ mô phỏng MATLAB
 
+Chuyển thư mục làm việc (*Current Folder*) trong MATLAB đến thư mục chứa mã nguồn này (`research/diff_drive_pid/matlab`) hoặc chạy:
+
 ```matlab
-cd('C:/Users/nghoa/Desktop/Industrial_AMR_Robot/research/diff_drive_pid/matlab')
+% Nếu mở MATLAB từ thư mục gốc repository:
+cd research/diff_drive_pid/matlab
 run_all
 ```
 

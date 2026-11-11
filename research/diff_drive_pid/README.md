@@ -25,10 +25,13 @@ Kết quả được lưu ở `docs/assets/` và `examples/data/`. Ảnh `speed_
 
 ### MATLAB
 
-Mở MATLAB và chạy:
+Mở MATLAB, chuyển thư mục làm việc (*Current Folder*) về thư mục chứa mã nguồn MATLAB và chạy:
 
 ```matlab
-cd('C:/Users/nghoa/Desktop/Industrial_AMR_Robot/research/diff_drive_pid/matlab')
+% Nếu đang ở thư mục gốc repo:
+cd research/diff_drive_pid/matlab
+% Hoặc mở trực tiếp thư mục research/diff_drive_pid/matlab trên thanh điều hướng MATLAB
+
 run_all
 ```
 

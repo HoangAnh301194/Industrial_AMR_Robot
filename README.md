@@ -1090,11 +1090,12 @@ export_stl export_lidar_unit.scad         lidar_unit_visual.stl
 cp meshes/*.stl ../src/factory_delivery_amr_description/meshes/
 ```
 
-**Cách chạy trong dự án này:**
+**Cách chạy trong dự án này (từ thư mục gốc repository):**
 ```bash
-cd /home/nhatnguyen/agv/cad
+cd cad
 ./export_all_stl.sh
-cp meshes/*.stl /home/nhatnguyen/agv/src/factory_delivery_amr_description/meshes/
+cp meshes/*.stl ../src/factory_delivery_amr_description/meshes/
+cd ..
 ```
 
 ---
@@ -1290,19 +1291,20 @@ Trong URDF có 4 loại khớp cơ bản thường dùng khi chuyển từ OpenS
 
 ### 4.9. Kiểm tra, Build và Chạy mô phỏng trong ROS 2 (RViz2 & Gazebo)
 
-Sau khi hoàn thiện các file `.scad` và `.urdf.xacro`, bạn thực hiện quy trình 4 bước sau trên Terminal để kiểm chứng toàn bộ hệ thống:
+Sau khi hoàn thiện các file `.scad` và `.urdf.xacro`, bạn thực hiện quy trình 4 bước sau trên Terminal (mở tại thư mục gốc của repository) để kiểm chứng toàn bộ hệ thống:
 
 #### Bước 1: Xuất toàn bộ Mesh STL từ OpenSCAD và cập nhật vào ROS 2 Package
 ```bash
-cd /home/nhatnguyen/agv/cad
+cd cad
 ./export_all_stl.sh
-cp meshes/*.stl /home/nhatnguyen/agv/src/factory_delivery_amr_description/meshes/
+cp meshes/*.stl ../src/factory_delivery_amr_description/meshes/
+cd ..
 ```
 
 #### Bước 2: Kiểm tra tính hợp lệ của cú pháp Xacro / URDF và Cây khung tọa độ (TF Tree)
 ```bash
 # Biên dịch thử file .xacro ra .urdf thuần và kiểm tra lỗi bằng check_urdf:
-xacro /home/nhatnguyen/agv/src/factory_delivery_amr_description/urdf/factory_delivery_amr.urdf.xacro > /tmp/test_amr.urdf
+xacro src/factory_delivery_amr_description/urdf/factory_delivery_amr.urdf.xacro > /tmp/test_amr.urdf
 check_urdf /tmp/test_amr.urdf
 
 # (Tùy chọn) Xuất sơ đồ cây động học ra file PDF để kiểm tra các khớp nối:
@@ -1311,7 +1313,7 @@ urdf_to_graphviz /tmp/test_amr.urdf /tmp/amr_tree
 
 #### Bước 3: Biên dịch Workspace ROS 2 bằng `colcon`
 ```bash
-cd /home/nhatnguyen/agv
+# Chạy tại thư mục gốc repository:
 colcon build --packages-select factory_delivery_amr_description --symlink-install
 source install/setup.bash
 ```
@@ -1319,15 +1321,15 @@ source install/setup.bash
 #### Bước 4: Khởi chạy hiển thị trên RViz2 và mô phỏng vật lý trên Gazebo
 ```bash
 # 1. Xem mô hình 3D trên RViz2 kèm thanh trượt điều chỉnh các khớp (joint_state_publisher_gui):
-source /home/nhatnguyen/agv/install/setup.bash
+source install/setup.bash
 ros2 launch factory_delivery_amr_description display.launch.py
 
 # 2. Chạy mô phỏng vật lý đầy đủ trong nhà máy với Gazebo Fortress + RViz2:
-source /home/nhatnguyen/agv/install/setup.bash
+source install/setup.bash
 ros2 launch factory_delivery_amr_description gazebo.launch.py
 
-# 3. Mở một Terminal khác để điều khiển Robot di chuyển và nâng/hạ bàn nâng bằng bàn phím:
-source /home/nhatnguyen/agv/install/setup.bash
+# 3. Mở một Terminal khác (tại thư mục gốc) để điều khiển Robot di chuyển và nâng/hạ bàn nâng bằng bàn phím:
+source install/setup.bash
 ros2 run factory_delivery_amr_description amr_keyboard_teleop.py
 ```
 

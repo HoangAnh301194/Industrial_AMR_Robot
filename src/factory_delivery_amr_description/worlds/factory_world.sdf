@@ -26,6 +26,10 @@
       <render_engine>ogre2</render_engine>
     </plugin>
 
+    <plugin
+      filename="ignition-gazebo-imu-system"
+      name="ignition::gazebo::systems::Imu"/>
+
 
     <!-- ============================================================= -->
     <!-- PHYSICS                                                       -->

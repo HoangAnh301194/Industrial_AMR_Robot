@@ -2,11 +2,22 @@
 
 set -e
 
-OPENSCAD="/snap/bin/openscad-nightly"
+# Đảm bảo luôn thực thi tại đúng thư mục chứa script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
-if [ ! -x "$OPENSCAD" ]; then
-    echo "ERROR: Khong tim thay OpenSCAD tai:"
-    echo "$OPENSCAD"
+# Tự động tìm OpenSCAD (ưu tiên openscad-nightly nếu có, sau đó là openscad thông thường)
+if command -v openscad-nightly >/dev/null 2>&1; then
+    OPENSCAD="$(command -v openscad-nightly)"
+elif [ -x "/snap/bin/openscad-nightly" ]; then
+    OPENSCAD="/snap/bin/openscad-nightly"
+elif command -v openscad >/dev/null 2>&1; then
+    OPENSCAD="$(command -v openscad)"
+elif [ -x "/usr/bin/openscad" ]; then
+    OPENSCAD="/usr/bin/openscad"
+else
+    echo "ERROR: Không tìm thấy OpenSCAD (openscad hoặc openscad-nightly) trên hệ thống!"
+    echo "Vui lòng cài đặt: sudo apt install openscad (hoặc sudo snap install openscad-nightly)"
     exit 1
 fi
 

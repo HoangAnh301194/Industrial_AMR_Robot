@@ -58,6 +58,18 @@
   gz_type_name: "ignition.msgs.Double"
   direction: GZ_TO_ROS
 
+- ros_topic_name: "/amr_1/scan"
+  gz_topic_name: "/amr_1/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "ignition.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/amr_1/imu"
+  gz_topic_name: "/amr_1/imu"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "ignition.msgs.IMU"
+  direction: GZ_TO_ROS
+
 # ============================================================================
 # ROBOT 2 (amr_2) - DRIVE, ODOMETRY & LIFT CONTROLLERS
 # ============================================================================
@@ -107,4 +119,31 @@
   gz_topic_name: "/amr_2/lift_command"
   ros_type_name: "std_msgs/msg/Float64"
   gz_type_name: "ignition.msgs.Double"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/amr_2/scan"
+  gz_topic_name: "/amr_2/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "ignition.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/amr_2/imu"
+  gz_topic_name: "/amr_2/imu"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "ignition.msgs.IMU"
+  direction: GZ_TO_ROS
+
+# ============================================================================
+# SINGLE ROBOT DEFAULT (TOPIC_PREFIX:="") - SENSORS & NAVIGATION
+# ============================================================================
+- ros_topic_name: "/scan"
+  gz_topic_name: "/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "ignition.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/imu"
+  gz_topic_name: "/imu"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "ignition.msgs.IMU"
   direction: GZ_TO_ROS

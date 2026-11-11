@@ -13,6 +13,7 @@
 
   <xacro:arg name="topic_prefix" default=""/>
   <xacro:property name="prefix" value="$(arg topic_prefix)"/>
+  <xacro:property name="frame_prefix" value="${prefix.strip('/') + '/' if prefix else ''}"/>
 
   <!-- ================================================================ -->
   <!-- PARAMETERS                                                       -->
@@ -537,6 +538,27 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
+  <!-- ================================================================ -->
+  <!-- IMU SENSOR LINK (6-AXIS IMU ON MAIN ELECTRONICS DECK)            -->
+  <!-- ================================================================ -->
+
+  <link name="imu_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.05"/>
+      <inertia
+        ixx="0.00001" ixy="0" ixz="0"
+        iyy="0.00001" iyz="0"
+        izz="0.00001"/>
+    </inertial>
+  </link>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0.068 0 0.178" rpy="0 0 0"/>
+  </joint>
+
   <xacro:fixed_mesh_link
     link_name="fixed_drive_hardware_link"
     joint_name="fixed_drive_hardware_joint"
@@ -1040,6 +1062,15 @@
 
   <link name="lidar_link">
 
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.25"/>
+      <inertia
+        ixx="0.0001" ixy="0" ixz="0"
+        iyy="0.0001" iyz="0"
+        izz="0.0001"/>
+    </inertial>
+
     <!-- Aluminum riser pedestal tower -->
     <visual name="lidar_pedestal_visual">
       <geometry>
@@ -1329,8 +1360,8 @@
       <odom_topic>${prefix}/odom</odom_topic>
       <tf_topic>${prefix}/tf</tf_topic>
 
-      <frame_id>${prefix}/odom</frame_id>
-      <child_frame_id>${prefix}/base_footprint</child_frame_id>
+      <frame_id>${frame_prefix}odom</frame_id>
+      <child_frame_id>${frame_prefix}base_footprint</child_frame_id>
 
       <odom_publish_frequency>50</odom_publish_frequency>
 
@@ -1471,6 +1502,110 @@
 
     </plugin>
 
+  </gazebo>
+
+
+  <!-- ================================================================ -->
+  <!-- 2D LIDAR SENSOR PLUGIN (IGNITION SENSORS / GPU_LIDAR)             -->
+  <!-- ================================================================ -->
+
+  <gazebo reference="lidar_link">
+    <sensor name="lidar" type="gpu_lidar">
+      <ignition_frame_id>${frame_prefix}lidar_link</ignition_frame_id>
+      <topic>${prefix}/scan</topic>
+      <update_rate>10</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159265</min_angle>
+            <max_angle>3.14159265</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.12</min>
+          <max>15.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <always_on>1</always_on>
+      <visualize>true</visualize>
+    </sensor>
+  </gazebo>
+
+
+  <!-- ================================================================ -->
+  <!-- 6-AXIS IMU SENSOR PLUGIN (IGNITION SENSORS / IMU)                -->
+  <!-- ================================================================ -->
+
+  <gazebo reference="imu_link">
+    <sensor name="imu_sensor" type="imu">
+      <ignition_frame_id>${frame_prefix}imu_link</ignition_frame_id>
+      <topic>${prefix}/imu</topic>
+      <update_rate>50</update_rate>
+      <always_on>1</always_on>
+      <visualize>false</visualize>
+      <imu>
+        <angular_velocity>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </z>
+        </angular_velocity>
+        <linear_acceleration>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </z>
+        </linear_acceleration>
+      </imu>
+    </sensor>
+  </gazebo>
+
+
+  <!-- ================================================================ -->
+  <!-- GAZEBO IMU SYSTEM PLUGIN                                         -->
+  <!-- ================================================================ -->
+
+  <gazebo>
+    <plugin
+      filename="ignition-gazebo-imu-system"
+      name="ignition::gazebo::systems::Imu">
+    </plugin>
   </gazebo>
 
 </robot>
