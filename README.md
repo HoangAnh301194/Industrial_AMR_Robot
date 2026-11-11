@@ -1287,11 +1287,65 @@ Trong URDF có 4 loại khớp cơ bản thường dùng khi chuyển từ OpenS
 </gazebo>
 ```
 
+#### 4. Plugin Cảm biến 2D LiDAR (`gpu_lidar`) và Cảm biến quán tính 6 trục IMU (`imu`)
+Để phục vụ bài toán định vị (Localization), lập bản đồ (SLAM) và điều hướng tự hành (Nav2), mô hình tích hợp 2 cảm biến quan trọng nhất qua Ignition Sensors:
+
+```xml
+<!-- 2D LiDAR 360 độ (10 Hz, 360 tia, tầm quét 0.12 - 15.0m) -->
+<gazebo reference="lidar_link">
+  <sensor name="lidar" type="gpu_lidar">
+    <ignition_frame_id>lidar_link</ignition_frame_id>
+    <topic>/scan</topic>
+    <update_rate>10</update_rate>
+    <ray>
+      <scan>
+        <horizontal>
+          <samples>360</samples>
+          <resolution>1</resolution>
+          <min_angle>-3.14159265</min_angle>
+          <max_angle>3.14159265</max_angle>
+        </horizontal>
+      </scan>
+      <range>
+        <min>0.12</min>
+        <max>15.0</max>
+        <resolution>0.01</resolution>
+      </range>
+      <noise>
+        <type>gaussian</type>
+        <mean>0.0</mean>
+        <stddev>0.01</stddev>
+      </noise>
+    </ray>
+    <always_on>1</always_on>
+    <visualize>true</visualize>
+  </sensor>
+</gazebo>
+
+<!-- 6-Axis IMU (50 Hz, đo gia tốc tuyến tính và vận tốc góc) -->
+<gazebo reference="imu_link">
+  <sensor name="imu_sensor" type="imu">
+    <ignition_frame_id>imu_link</ignition_frame_id>
+    <topic>/imu</topic>
+    <update_rate>50</update_rate>
+    <always_on>1</always_on>
+    <visualize>false</visualize>
+  </sensor>
+</gazebo>
+
+<!-- System plugin kích hoạt giải thuật mô phỏng IMU -->
+<gazebo>
+  <plugin filename="ignition-gazebo-imu-system"
+          name="ignition::gazebo::systems::Imu">
+  </plugin>
+</gazebo>
+```
+
 ---
 
 ### 4.9. Kiểm tra, Build và Chạy mô phỏng trong ROS 2 (RViz2 & Gazebo)
 
-Sau khi hoàn thiện các file `.scad` và `.urdf.xacro`, bạn thực hiện quy trình 4 bước sau trên Terminal (mở tại thư mục gốc của repository) để kiểm chứng toàn bộ hệ thống:
+Sau khi hoàn thiện các file `.scad` và `.urdf.xacro`, bạn thực hiện quy trình 5 bước sau trên Terminal (mở tại thư mục gốc của repository) để kiểm chứng toàn bộ hệ thống:
 
 #### Bước 1: Xuất toàn bộ Mesh STL từ OpenSCAD và cập nhật vào ROS 2 Package
 ```bash
@@ -1324,13 +1378,49 @@ source install/setup.bash
 source install/setup.bash
 ros2 launch factory_delivery_amr_description display.launch.py
 
-# 2. Chạy mô phỏng vật lý đầy đủ trong nhà máy với Gazebo Fortress + RViz2:
+# 2. Chạy mô phỏng vật lý đầy đủ trong nhà máy với Gazebo Fortress (2 robot amr_1 & amr_2):
 source install/setup.bash
 ros2 launch factory_delivery_amr_description gazebo.launch.py
 
 # 3. Mở một Terminal khác (tại thư mục gốc) để điều khiển Robot di chuyển và nâng/hạ bàn nâng bằng bàn phím:
 source install/setup.bash
 ros2 run factory_delivery_amr_description amr_keyboard_teleop.py
+```
+
+#### Bước 5: Kiểm tra và Test toàn bộ Topic Cảm biến & Điều khiển qua ROS 2 CLI
+Mở một Terminal mới (sau khi đã khởi chạy `gazebo.launch.py`), source môi trường và thực hiện các lệnh test sau:
+
+```bash
+source install/setup.bash
+
+# 1. Liệt kê toàn bộ các topic đang hoạt động được bridge giữa Gazebo và ROS 2:
+ros2 topic list
+
+# Các topic tiêu biểu của Robot 1 (/amr_1):
+#   /amr_1/cmd_vel
+#   /amr_1/odom
+#   /amr_1/scan          (2D LiDAR LaserScan)
+#   /amr_1/imu           (6-Axis IMU sensor)
+#   /amr_1/joint_states  (Trạng thái bánh xe và bàn nâng)
+#   /amr_1/lift_position (Vị trí bàn nâng cắt kéo)
+#   /clock               (Đồng hồ mô phỏng Gazebo)
+
+# 2. Test dữ liệu 2D LiDAR (360 độ, 10 Hz):
+ros2 topic hz /amr_1/scan
+ros2 topic echo /amr_1/scan --once
+
+# 3. Test dữ liệu IMU 6 trục (50 Hz):
+ros2 topic hz /amr_1/imu
+ros2 topic echo /amr_1/imu --once
+
+# 4. Test dữ liệu Odometry (vị trí x, y, góc quay yaw và vận tốc):
+ros2 topic echo /amr_1/odom --once
+
+# 5. Test gửi lệnh điều khiển vận tốc cho robot di chuyển thẳng (v = 0.5 m/s):
+ros2 topic pub /amr_1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.5, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}" --once
+
+# 6. Test gửi lệnh nâng bàn nâng lên độ cao 0.20 m:
+ros2 topic pub /amr_1/lift_position std_msgs/msg/Float64 "{data: 0.20}" --once
 ```
 
 ---
