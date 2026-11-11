@@ -12,14 +12,19 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
-    package_name = "factory_delivery_amr_description"
+    package_name = "factory_delivery_amr_gazebo"
+    description_package_name = "factory_delivery_amr_description"
 
     package_share = get_package_share_directory(
         package_name
     )
 
+    description_share = get_package_share_directory(
+        description_package_name
+    )
+
     xacro_file = os.path.join(
-        package_share,
+        description_share,
         "urdf",
         "factory_delivery_amr.urdf.xacro",
     )

@@ -16,36 +16,44 @@
 
 ## ⚡ HƯỚNG DẪN KHỞI CHẠY NHANH (QUICKSTART)
 
-Dưới đây là các lệnh chạy kiểm tra toàn bộ hệ thống Robot trên Gazebo Fortress và RViz2 (thực hiện từ thư mục gốc của repository):
+Dưới đây là các lệnh chạy kiểm tra toàn bộ hệ thống Robot trên Gazebo Fortress và RViz2 (thực hiện từ thư mục gốc của ROS 2 Workspace):
 
 ### 1. Biên dịch Workspace ROS 2
 ```bash
-colcon build --packages-select factory_delivery_amr_description --symlink-install
+# Biên dịch toàn bộ các gói trong workspace:
+colcon build --symlink-install
 source install/setup.bash
 ```
 
-### 2. Khởi chạy Mô phỏng Nhà kho Gazebo (Warehouse + 2 Robot AMR + Dock sạc + Kệ hàng)
+### 2. Xem mô hình URDF 3D đơn chiếc trên RViz2 (Kèm GUI trượt khớp)
+```bash
+# Terminal:
+source install/setup.bash
+ros2 launch factory_delivery_amr_description display.launch.py
+```
+
+### 3. Khởi chạy Mô phỏng Nhà kho Gazebo (Warehouse + 2 Robot AMR + Dock sạc + Kệ hàng)
 ```bash
 # Terminal 1:
 source install/setup.bash
-ros2 launch factory_delivery_amr_description gazebo.launch.py
+ros2 launch factory_delivery_amr_gazebo gazebo.launch.py
 ```
 
-### 3. Mở RViz2 quan sát trực quan CẢ 2 ROBOT cùng cảm biến LiDAR 360°, IMU, TF
+### 4. Mở RViz2 quan sát trực quan CẢ 2 ROBOT cùng cảm biến LiDAR 360°, IMU, TF
 ```bash
 # Terminal 2:
 source install/setup.bash
-ros2 launch factory_delivery_amr_description rviz_sensors.launch.py
+ros2 launch factory_delivery_amr_gazebo rviz_sensors.launch.py
 ```
 
-### 4. Điều khiển Robot di chuyển và nâng bàn nâng bằng bàn phím (Teleop)
+### 5. Điều khiển Robot di chuyển và nâng bàn nâng bằng bàn phím (Teleop)
 ```bash
 # Terminal 3:
 source install/setup.bash
-ros2 run factory_delivery_amr_description amr_keyboard_teleop.py
+ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py
 ```
 
-### 5. Kiểm tra dữ liệu cảm biến (LiDAR 2D & IMU 6 trục) qua ROS 2 CLI
+### 6. Kiểm tra dữ liệu cảm biến (LiDAR 2D & IMU 6 trục) qua ROS 2 CLI
 ```bash
 # Terminal 4:
 source install/setup.bash
@@ -58,6 +66,42 @@ ros2 topic echo /amr_1/imu --once
 
 # Xem tọa độ Odometry vi sai:
 ros2 topic echo /amr_1/odom --once
+```
+
+---
+
+## 🏗️ CẤU TRÚC WORKSPACE ROS 2 CHUẨN CÔNG NGHIỆP
+
+Repository được tổ chức theo chuẩn **ROS 2 Workspace** mô-đun hóa, phân tách rành mạch giữa mô hình thiết kế CAD, tài liệu kỹ thuật và các gói phần mềm ROS 2:
+
+```text
+Industrial_AMR_Robot/                 <-- ROS 2 Workspace Root
+├── cad/                              <-- Mã nguồn CAD OpenSCAD & Scripts xuất STL
+│   ├── main.scad                     <-- Bản vẽ lắp ráp tổng thể tham số hóa
+│   ├── parts/                        <-- Chi tiết cơ khí: chassis, bánh xe, bàn nâng...
+│   └── export_*.scad                 <-- File xuất từng link độc lập
+├── docs/                             <-- Tài liệu đồ án và đặc tả kỹ thuật
+│   ├── reports/                      <-- Báo cáo tốt nghiệp (LaTeX main.tex, main.pdf, docx, slide)
+│   ├── specifications/               <-- Tài liệu yêu cầu kỹ thuật, sơ đồ hệ thống V-model
+│   └── images/                       <-- Hình ảnh minh họa trực quan
+├── research/                         <-- Tài liệu tham khảo, bài báo khoa học liên quan
+├── slides/                           <-- Slide thuyết trình Beamer LaTeX
+├── src/                              <-- Thư mục chứa các ROS 2 Packages
+│   ├── factory_delivery_amr_description/   <-- Gói mô tả robot (URDF/Xacro, Mesh, RViz display)
+│   │   ├── meshes/                   <-- File 3D Binary STL từng link
+│   │   ├── urdf/                     <-- File Xacro mô hình robot, joint, plugin Gazebo
+│   │   ├── rviz/                     <-- Cấu hình hiển thị RViz (display.rviz)
+│   │   ├── launch/                   <-- display.launch.py
+│   │   └── scripts/                  <-- scissor_visualizer.py
+│   └── factory_delivery_amr_gazebo/        <-- Gói mô phỏng Gazebo Fortress
+│       ├── worlds/                   <-- factory_world.sdf (Nhà xưởng, dock sạc, kệ hàng)
+│       ├── models/                   <-- Mô hình SDF: warehouse, charging_station, smart_storage_rack
+│       ├── config/                   <-- bridge.yaml (Cấu hình cầu nối ros_gz_bridge)
+│       ├── rviz/                     <-- amr_gazebo_sensors.rviz (Quan sát đa robot)
+│       ├── launch/                   <-- gazebo.launch.py, rviz_sensors.launch.py
+│       └── scripts/                  <-- amr_keyboard_teleop.py, dual_amr_teleop.py, lift_controller.py
+├── .gitignore                        <-- Loại bỏ build/, install/, log/, tmp/, file tạm LaTeX
+└── README.md                         <-- Cẩm nang toàn diện dự án
 ```
 
 ---
@@ -1415,28 +1459,28 @@ urdf_to_graphviz /tmp/test_amr.urdf /tmp/amr_tree
 
 #### Bước 3: Biên dịch Workspace ROS 2 bằng `colcon`
 ```bash
-# Chạy tại thư mục gốc repository:
-colcon build --packages-select factory_delivery_amr_description --symlink-install
+# Chạy tại thư mục gốc Workspace:
+colcon build --symlink-install
 source install/setup.bash
 ```
 
 #### Bước 4: Khởi chạy hiển thị trên RViz2 và mô phỏng vật lý trên Gazebo
 ```bash
-# 1. Xem mô hình 3D trên RViz2 kèm thanh trượt điều chỉnh các khớp (joint_state_publisher_gui):
+# 1. Xem mô hình URDF 3D trên RViz2 kèm thanh trượt điều chỉnh các khớp (joint_state_publisher_gui):
 source install/setup.bash
 ros2 launch factory_delivery_amr_description display.launch.py
 
 # 2. Chạy mô phỏng vật lý đầy đủ trong nhà máy với Gazebo Fortress (2 robot amr_1 & amr_2):
 source install/setup.bash
-ros2 launch factory_delivery_amr_description gazebo.launch.py
+ros2 launch factory_delivery_amr_gazebo gazebo.launch.py
 
 # 3. Mở một Terminal khác (tại thư mục gốc) để điều khiển Robot di chuyển và nâng/hạ bàn nâng bằng bàn phím:
 source install/setup.bash
-ros2 run factory_delivery_amr_description amr_keyboard_teleop.py
+ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py
 
 # 4. Mở RViz2 trực quan hóa toàn bộ cảm biến (Mô hình Robot 3D, tia quét 2D LiDAR, Odometry và trục tọa độ TF):
 source install/setup.bash
-ros2 launch factory_delivery_amr_description rviz_sensors.launch.py
+ros2 launch factory_delivery_amr_gazebo rviz_sensors.launch.py
 ```
 
 #### Bước 5: Kiểm tra và Test toàn bộ Topic Cảm biến & Điều khiển qua ROS 2 CLI
@@ -1480,7 +1524,7 @@ ros2 topic pub /amr_1/lift_position std_msgs/msg/Float64 "{data: 0.20}" --once
 Sau khi khởi chạy file hiển thị:
 ```bash
 source install/setup.bash
-ros2 launch factory_delivery_amr_description rviz_sensors.launch.py
+ros2 launch factory_delivery_amr_gazebo rviz_sensors.launch.py
 ```
 
 Cửa sổ **RViz2** sẽ hiển thị:

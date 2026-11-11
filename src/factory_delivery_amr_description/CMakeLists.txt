@@ -4,7 +4,6 @@ project(factory_delivery_amr_description)
 
 find_package(ament_cmake REQUIRED)
 
-
 # ============================================================================
 # INSTALL ROBOT DESCRIPTION RESOURCES
 # ============================================================================
@@ -14,13 +13,9 @@ install(
     urdf
     meshes
     launch
-    config
-    worlds
-    models
     rviz
   DESTINATION share/${PROJECT_NAME}
 )
-
 
 # ============================================================================
 # INSTALL PYTHON EXECUTABLES
@@ -29,12 +24,8 @@ install(
 install(
   PROGRAMS
     scripts/scissor_visualizer.py
-    scripts/lift_gazebo_controller.py
-    scripts/dual_amr_teleop.py
-    scripts/amr_keyboard_teleop.py
   DESTINATION lib/${PROJECT_NAME}
 )
-
 
 # ============================================================================
 # FINISH AMENT PACKAGE

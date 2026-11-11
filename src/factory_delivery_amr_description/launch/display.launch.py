@@ -26,6 +26,12 @@ def generate_launch_description():
         "factory_delivery_amr.urdf.xacro",
     )
 
+    default_rviz_file = os.path.join(
+        package_share,
+        "rviz",
+        "display.rviz",
+    )
+
 
     # ========================================================================
     # LAUNCH ARGUMENTS
@@ -127,6 +133,7 @@ def generate_launch_description():
         executable="rviz2",
         name="rviz2",
         output="screen",
+        arguments=["-d", default_rviz_file],
         parameters=[
             {
                 "use_sim_time": LaunchConfiguration(
