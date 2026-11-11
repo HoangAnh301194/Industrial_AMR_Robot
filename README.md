@@ -48,9 +48,12 @@ ros2 launch factory_delivery_amr_gazebo rviz_sensors.launch.py
 
 ### 5. Điều khiển Robot di chuyển và nâng bàn nâng bằng bàn phím (Teleop)
 ```bash
-# Terminal 3:
+# Terminal 3 (Điều khiển riêng Xe 1 - hoặc truyền số "2" để điều khiển Xe 2):
 source install/setup.bash
-ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py
+ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py 1
+
+# Hoặc điều khiển luân phiên/song song cả 2 xe trong 1 Terminal duy nhất:
+ros2 run factory_delivery_amr_gazebo dual_amr_teleop.py
 ```
 
 ### 6. Kiểm tra dữ liệu cảm biến (LiDAR 2D & IMU 6 trục) qua ROS 2 CLI
@@ -99,7 +102,7 @@ Industrial_AMR_Robot/                 <-- ROS 2 Workspace Root
 │       ├── config/                   <-- bridge.yaml (Cấu hình cầu nối ros_gz_bridge)
 │       ├── rviz/                     <-- amr_gazebo_sensors.rviz (Quan sát đa robot)
 │       ├── launch/                   <-- gazebo.launch.py, rviz_sensors.launch.py
-│       └── scripts/                  <-- amr_keyboard_teleop.py, dual_amr_teleop.py, lift_controller.py
+│       └── scripts/                  <-- amr_keyboard_teleop.py, dual_amr_teleop.py, lift_gazebo_controller.py
 ├── .gitignore                        <-- Loại bỏ build/, install/, log/, tmp/, file tạm LaTeX
 └── README.md                         <-- Cẩm nang toàn diện dự án
 ```
@@ -1476,7 +1479,10 @@ ros2 launch factory_delivery_amr_gazebo gazebo.launch.py
 
 # 3. Mở một Terminal khác (tại thư mục gốc) để điều khiển Robot di chuyển và nâng/hạ bàn nâng bằng bàn phím:
 source install/setup.bash
-ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py
+# Điều khiển riêng Xe 1 (hoặc truyền tham số "2" cho Xe 2):
+ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py 1
+# Hoặc dùng trình điều khiển tổng hợp cả 2 xe trong 1 Terminal:
+# ros2 run factory_delivery_amr_gazebo dual_amr_teleop.py
 
 # 4. Mở RViz2 trực quan hóa toàn bộ cảm biến (Mô hình Robot 3D, tia quét 2D LiDAR, Odometry và trục tọa độ TF):
 source install/setup.bash
@@ -1498,7 +1504,7 @@ ros2 topic list
 #   /amr_1/scan          (2D LiDAR LaserScan)
 #   /amr_1/imu           (6-Axis IMU sensor)
 #   /amr_1/joint_states  (Trạng thái bánh xe và bàn nâng)
-#   /amr_1/lift_position (Vị trí bàn nâng cắt kéo)
+#   /amr_1/lift_command  (Lệnh nâng đồng bộ bàn nâng + cơ cấu cắt kéo)
 #   /clock               (Đồng hồ mô phỏng Gazebo)
 
 # 2. Test dữ liệu 2D LiDAR (360 độ, 10 Hz):
@@ -1515,8 +1521,8 @@ ros2 topic echo /amr_1/odom --once
 # 5. Test gửi lệnh điều khiển vận tốc cho robot di chuyển thẳng (v = 0.5 m/s):
 ros2 topic pub /amr_1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.5, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}" --once
 
-# 6. Test gửi lệnh nâng bàn nâng lên độ cao 0.20 m:
-ros2 topic pub /amr_1/lift_position std_msgs/msg/Float64 "{data: 0.20}" --once
+# 6. Test gửi lệnh nâng bàn nâng lên độ cao 0.20 m (đồng bộ cùng cơ cấu cắt kéo):
+ros2 topic pub /amr_1/lift_command std_msgs/msg/Float64 "{data: 0.20}" --once
 ```
 
 #### Bước 6: Hướng dẫn quan sát trực quan 2 Robot trên RViz2

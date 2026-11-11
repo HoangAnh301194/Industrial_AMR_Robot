@@ -2,8 +2,8 @@
 """
 Single-Robot Keyboard Teleop for Factory Delivery AMR in Gazebo.
 Run 1 terminal per robot:
-  Terminal Xe 1: ros2 run factory_delivery_amr_description amr_keyboard_teleop.py 1
-  Terminal Xe 2: ros2 run factory_delivery_amr_description amr_keyboard_teleop.py 2
+  Terminal Xe 1: ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py 1
+  Terminal Xe 2: ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py 2
 """
 
 import select
