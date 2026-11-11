@@ -14,6 +14,54 @@
 
 ---
 
+## ⚡ HƯỚNG DẪN KHỞI CHẠY NHANH (QUICKSTART)
+
+Dưới đây là các lệnh chạy kiểm tra toàn bộ hệ thống Robot trên Gazebo Fortress và RViz2 (thực hiện từ thư mục gốc của repository):
+
+### 1. Biên dịch Workspace ROS 2
+```bash
+colcon build --packages-select factory_delivery_amr_description --symlink-install
+source install/setup.bash
+```
+
+### 2. Khởi chạy Mô phỏng Nhà kho Gazebo (Warehouse + 2 Robot AMR + Dock sạc + Kệ hàng)
+```bash
+# Terminal 1:
+source install/setup.bash
+ros2 launch factory_delivery_amr_description gazebo.launch.py
+```
+
+### 3. Mở RViz2 quan sát trực quan CẢ 2 ROBOT cùng cảm biến LiDAR 360°, IMU, TF
+```bash
+# Terminal 2:
+source install/setup.bash
+ros2 launch factory_delivery_amr_description rviz_sensors.launch.py
+```
+
+### 4. Điều khiển Robot di chuyển và nâng bàn nâng bằng bàn phím (Teleop)
+```bash
+# Terminal 3:
+source install/setup.bash
+ros2 run factory_delivery_amr_description amr_keyboard_teleop.py
+```
+
+### 5. Kiểm tra dữ liệu cảm biến (LiDAR 2D & IMU 6 trục) qua ROS 2 CLI
+```bash
+# Terminal 4:
+source install/setup.bash
+
+# Xem dữ liệu quét 360 độ từ 2D LiDAR (10 Hz):
+ros2 topic echo /amr_1/scan --once
+
+# Xem dữ liệu gia tốc và con quay từ IMU (50 Hz):
+ros2 topic echo /amr_1/imu --once
+
+# Xem tọa độ Odometry vi sai:
+ros2 topic echo /amr_1/odom --once
+```
+
+---
+
 ## MỤC LỤC
 
 - [PHẦN 1: TỔNG QUAN & HƯỚNG DẪN SỬ DỤNG OPENSCAD](#phần-1-tổng-quan--hướng-dẫn-sử-dụng-openscad)
