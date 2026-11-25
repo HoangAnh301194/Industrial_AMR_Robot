@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Interactive Dual-AMR Keyboard Teleop for Gazebo (hold-to-move, auto-stop)."""
 
+import os
 import select
 import sys
 import termios
@@ -10,6 +11,7 @@ import tty
 from geometry_msgs.msg import Twist
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import HistoryPolicy, QoSProfile, ReliabilityPolicy
 from std_msgs.msg import Float64
 
 DEFAULT_LIN_SPEED = 0.45
@@ -22,7 +24,7 @@ BANNER = """
 ====================================================================
    ĐIỀU KHIỂN 2 XE AGV/AMR TRONG GAZEBO (amr_1 & amr_2)
 ====================================================================
-  CHỌN XE (tự dừng xe cũ khi chuyển):
+  CHỌN XE (chỉ gửi lệnh cho xe đang chọn, không tranh chấp xe còn lại):
     [1] : Điều khiển XE 1 (/amr_1)
     [2] : Điều khiển XE 2 (/amr_2)
     [3] : Điều khiển CẢ 2 XE cùng lúc (/amr_1 + /amr_2)
@@ -47,14 +49,19 @@ BANNER = """
 class DualAmrTeleop(Node):
 
     def __init__(self):
-        super().__init__("dual_amr_teleop")
+        super().__init__(f"dual_amr_teleop_{os.getpid()}")
+        cmd_qos = QoSProfile(
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1,
+            reliability=ReliabilityPolicy.RELIABLE,
+        )
         self.cmd_pubs = {
-            1: self.create_publisher(Twist, "/amr_1/cmd_vel", 10),
-            2: self.create_publisher(Twist, "/amr_2/cmd_vel", 10),
+            1: self.create_publisher(Twist, "/amr_1/cmd_vel", cmd_qos),
+            2: self.create_publisher(Twist, "/amr_2/cmd_vel", cmd_qos),
         }
         self.lift_pubs = {
-            1: self.create_publisher(Float64, "/amr_1/lift_command", 10),
-            2: self.create_publisher(Float64, "/amr_2/lift_command", 10),
+            1: self.create_publisher(Float64, "/amr_1/lift_command", cmd_qos),
+            2: self.create_publisher(Float64, "/amr_2/lift_command", cmd_qos),
         }
         self.active_mode = 1
         self.lin_speed = DEFAULT_LIN_SPEED
@@ -69,10 +76,13 @@ class DualAmrTeleop(Node):
     def target_ids(self):
         return [1] if self.active_mode == 1 else ([2] if self.active_mode == 2 else [1, 2])
 
-    def stop_all(self):
-        for rid in (1, 2):
+    def stop_robots(self, rids):
+        for rid in rids:
             self.linear_vel[rid] = 0.0
             self.angular_vel[rid] = 0.0
+            if not self.last_sent_zero[rid]:
+                self.publish_cmd_vel(rid)
+                self.last_sent_zero[rid] = True
 
     def publish_cmd_vel(self, rid: int):
         twist = Twist()
@@ -88,7 +98,7 @@ class DualAmrTeleop(Node):
     def on_timer(self):
         now = time.monotonic()
         changed = False
-        for rid in (1, 2):
+        for rid in self.target_ids():
             if (self.linear_vel[rid] != 0.0 or self.angular_vel[rid] != 0.0) and (
                 now - self.last_move_time[rid] > KEY_TIMEOUT_SEC
             ):
@@ -131,7 +141,6 @@ def read_latest_key() -> str:
                     return {"A": "UP", "B": "DOWN", "C": "RIGHT", "D": "LEFT"}.get(c3, "ESC")
         return "ESC"
 
-    # Drain duplicate queued repeat characters so latency never builds up
     while select.select([sys.stdin], [], [], 0.0)[0]:
         nxt = sys.stdin.read(1)
         if nxt != c1:
@@ -168,9 +177,9 @@ def main(args=None):
             vel_updated = False
 
             if key in ("1", "2", "3"):
-                node.stop_all()
+                old_targets = node.target_ids()
+                node.stop_robots(old_targets)
                 node.active_mode = int(key)
-                vel_updated = True
             elif key in ("+", "="):
                 node.lin_speed = min(MAX_LIN_SPEED, round(node.lin_speed + 0.10, 2))
                 node.ang_speed = min(MAX_ANG_SPEED, round(node.ang_speed + 0.15, 2))
@@ -236,7 +245,7 @@ def main(args=None):
                 lift_updated = True
 
             if vel_updated:
-                for rid in (1, 2):
+                for rid in node.target_ids():
                     node.publish_cmd_vel(rid)
                     node.last_sent_zero[rid] = node.linear_vel[rid] == 0.0 and node.angular_vel[rid] == 0.0
             if lift_updated:
@@ -245,11 +254,9 @@ def main(args=None):
 
             node.print_status()
     finally:
-        node.stop_all()
-        for rid in (1, 2):
-            node.publish_cmd_vel(rid)
+        node.stop_robots(node.target_ids())
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
-        print("\nĐã dừng cả 2 xe và thoát điều khiển.")
+        print("\nĐã dừng xe đang chọn và thoát điều khiển.")
         node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
