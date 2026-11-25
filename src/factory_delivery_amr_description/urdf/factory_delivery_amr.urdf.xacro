@@ -1511,6 +1511,7 @@
 
   <gazebo reference="lidar_link">
     <sensor name="lidar" type="gpu_lidar">
+      <pose>0 0 0.027 0 0 0</pose>
       <ignition_frame_id>${frame_prefix}lidar_link</ignition_frame_id>
       <topic>${prefix}/scan</topic>
       <update_rate>10</update_rate>

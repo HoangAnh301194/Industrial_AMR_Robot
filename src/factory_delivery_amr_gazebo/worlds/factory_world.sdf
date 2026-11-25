@@ -38,7 +38,7 @@
     <physics name="factory_physics" type="ode">
 
       <max_step_size>
-        0.001
+        0.004
       </max_step_size>
 
       <real_time_factor>
@@ -46,7 +46,7 @@
       </real_time_factor>
 
       <real_time_update_rate>
-        1000
+        250
       </real_time_update_rate>
 
     </physics>
@@ -228,13 +228,13 @@
 
 
     <!-- ============================================================= -->
-    <!-- WAREHOUSE STRUCTURE & CORRIDORS                               -->
+    <!-- COMPACT WAREHOUSE STRUCTURE & CORRIDORS (16 m x 10 m)         -->
     <!-- ============================================================= -->
 
     <include>
-      <name>warehouse</name>
-      <uri>model://warehouse</uri>
-      <pose>0 0 -0.1 0 0 0</pose>
+      <name>compact_warehouse</name>
+      <uri>model://compact_warehouse</uri>
+      <pose>0 0 0 0 0 0</pose>
     </include>
 
 

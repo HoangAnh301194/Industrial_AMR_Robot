@@ -120,12 +120,12 @@ class LiftGazeboController(Node):
         # ================================================================
         # CONTINUOUS COMMAND TIMER
         #
-        # Keep publishing targets at 30 Hz so Gazebo controllers continue
-        # holding the lift and scissor-joint positions.
+        # Keep publishing targets at 10 Hz so Gazebo controllers continue
+        # holding the lift and scissor-joint positions cleanly.
         # ================================================================
 
         self.timer = self.create_timer(
-            1.0 / 30.0,
+            1.0 / 10.0,
             self.publish_commands,
         )
 

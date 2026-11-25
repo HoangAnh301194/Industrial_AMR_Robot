@@ -32,33 +32,60 @@ source install/setup.bash
 ros2 launch factory_delivery_amr_description display.launch.py
 ```
 
-### 3. Khởi chạy Mô phỏng Nhà kho Gazebo (Warehouse + 2 Robot AMR + Dock sạc + Kệ hàng)
+### 3. Khởi chạy Mô phỏng Nhà kho Gazebo (Mặc định 1 Robot `amr_1`)
 ```bash
-# Terminal 1:
+# Terminal 1 (Chế độ 1 robot amr_1 tại tâm (0, 0) - khuyên dùng khi chạy SLAM/Nav2):
 source install/setup.bash
 ros2 launch factory_delivery_amr_gazebo gazebo.launch.py
+
+# Tùy chọn chạy 2 robot song song (amr_1 & amr_2):
+# ros2 launch factory_delivery_amr_gazebo gazebo.launch.py multi_robot:=true
+
+# Tùy chọn chạy không giao diện Gazebo (nhẹ CPU/GPU hơn):
+# ros2 launch factory_delivery_amr_gazebo gazebo.launch.py headless:=true
 ```
 
-### 4. Mở RViz2 quan sát trực quan CẢ 2 ROBOT cùng cảm biến LiDAR 360°, IMU, TF
+### 4. Chạy Tự hành hoàn toàn với Nav2 & chọn vị trí trực tiếp trên RViz2
 ```bash
-# Terminal 2:
+# Terminal 2 (Khởi chạy Nav2 + Bản đồ nhà kho + Giao diện điều khiển RViz2):
+source install/setup.bash
+ros2 launch factory_delivery_amr_navigation navigation.launch.py
+```
+> **Thao tác trên cửa sổ RViz2 để Robot tự hành hoàn toàn:**
+> 1. Trên thanh công cụ phía trên, bấm **`2D Pose Estimate`** $\rightarrow$ click vào **tâm lưới `(0, 0)`** và kéo mũi tên **hướng sang phải (`+X`)** để định vị ban đầu cho `amr_1` (`/amr_1/initialpose`). Toàn bộ mô hình robot 3D, tia quét LiDAR và Costmap sẽ tự khớp lên bản đồ.
+> 2. Bấm **`Nav2 Goal`** $\rightarrow$ click và kéo hướng đích tại bất kỳ vị trí trống nào trong nhà kho. Robot sẽ tự lập đường đi toàn cục (`NavfnPlanner`), tự tránh tường/kệ hàng/trạm sạc (`DWBLocalPlanner`) và tự hành hoàn toàn đến đích.
+
+### 5. (Tùy chọn) Tự quét lại bản đồ SLAM & Chạy nhiệm vụ tự động
+```bash
+# Chạy SLAM lập bản đồ mới (chạy thay cho Bước 4 sau khi mở Gazebo):
+source install/setup.bash
+ros2 launch factory_delivery_amr_navigation slam.launch.py
+
+# Lưu bản đồ đã quét thành maps/warehouse_map.{yaml,pgm}:
+source install/setup.bash
+ros2 run factory_delivery_amr_navigation save_warehouse_map.py
+
+# Hoặc chạy kịch bản giao hàng tự động (tự động set initialpose, đi lấy/trả hàng & nâng bàn nâng):
+source install/setup.bash
+ros2 run factory_delivery_amr_navigation autonomous_mission.py amr_1
+```
+
+### 6. Quan sát cảm biến thô, Điều khiển bàn phím (Teleop) & Kiểm tra Topic CLI
+```bash
+# Terminal 3 (Mở RViz2 quan sát cảm biến thô khi KHÔNG chạy Nav2/SLAM):
 source install/setup.bash
 ros2 launch factory_delivery_amr_gazebo rviz_sensors.launch.py
-```
+# (Thêm multi_robot:=true nếu Gazebo đang bật 2 robot)
 
-### 5. Điều khiển Robot di chuyển và nâng bàn nâng bằng bàn phím (Teleop)
-```bash
-# Terminal 3 (Điều khiển riêng Xe 1 - hoặc truyền số "2" để điều khiển Xe 2):
+# Hoặc điều khiển Robot di chuyển và nâng bàn nâng thủ công bằng bàn phím:
 source install/setup.bash
 ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py 1
-
-# Hoặc điều khiển luân phiên/song song cả 2 xe trong 1 Terminal duy nhất:
-ros2 run factory_delivery_amr_gazebo dual_amr_teleop.py
+# Hoặc điều khiển cả 2 xe khi chạy multi_robot:=true:
+# ros2 run factory_delivery_amr_gazebo dual_amr_teleop.py
 ```
 
-### 6. Kiểm tra dữ liệu cảm biến (LiDAR 2D & IMU 6 trục) qua ROS 2 CLI
 ```bash
-# Terminal 4:
+# Terminal 4 (Kiểm tra dữ liệu cảm biến 2D LiDAR & IMU 6 trục qua ROS 2 CLI):
 source install/setup.bash
 
 # Xem dữ liệu quét 360 độ từ 2D LiDAR (10 Hz):
@@ -96,13 +123,19 @@ Industrial_AMR_Robot/                 <-- ROS 2 Workspace Root
 │   │   ├── rviz/                     <-- Cấu hình hiển thị RViz (display.rviz)
 │   │   ├── launch/                   <-- display.launch.py
 │   │   └── scripts/                  <-- scissor_visualizer.py
-│   └── factory_delivery_amr_gazebo/        <-- Gói mô phỏng Gazebo Fortress
-│       ├── worlds/                   <-- factory_world.sdf (Nhà xưởng, dock sạc, kệ hàng)
-│       ├── models/                   <-- Mô hình SDF: warehouse, charging_station, smart_storage_rack
-│       ├── config/                   <-- bridge.yaml (Cấu hình cầu nối ros_gz_bridge)
-│       ├── rviz/                     <-- amr_gazebo_sensors.rviz (Quan sát đa robot)
-│       ├── launch/                   <-- gazebo.launch.py, rviz_sensors.launch.py
-│       └── scripts/                  <-- amr_keyboard_teleop.py, dual_amr_teleop.py, lift_gazebo_controller.py
+│   ├── factory_delivery_amr_gazebo/        <-- Gói mô phỏng Gazebo Fortress
+│   │   ├── worlds/                   <-- factory_world.sdf (Nhà xưởng, dock sạc, kệ hàng)
+│   │   ├── models/                   <-- Mô hình SDF: compact_warehouse (16m x 10m), charging_station, smart_storage_rack
+│   │   ├── config/                   <-- bridge.yaml (Cấu hình cầu nối ros_gz_bridge)
+│   │   ├── rviz/                     <-- amr_gazebo_sensors.rviz (Quan sát cảm biến đa robot)
+│   │   ├── launch/                   <-- gazebo.launch.py, rviz_sensors.launch.py
+│   │   └── scripts/                  <-- amr_keyboard_teleop.py, dual_amr_teleop.py, lift_gazebo_controller.py
+│   └── factory_delivery_amr_navigation/    <-- Gói lập bản đồ SLAM & Điều hướng tự hành Nav2
+│       ├── config/                   <-- slam_toolbox_params.yaml, nav2_params.yaml
+│       ├── maps/                     <-- Bản đồ 2D nhà kho (warehouse_map.yaml, warehouse_map.pgm)
+│       ├── rviz/                     <-- navigation.rviz (Bảng điều khiển tự hành Nav2 + 2D Pose Estimate)
+│       ├── launch/                   <-- slam.launch.py, navigation.launch.py
+│       └── scripts/                  <-- save_warehouse_map.py, autonomous_mission.py
 ├── .gitignore                        <-- Loại bỏ build/, install/, log/, tmp/, file tạm LaTeX
 └── README.md                         <-- Cẩm nang toàn diện dự án
 ```
@@ -1473,20 +1506,25 @@ source install/setup.bash
 source install/setup.bash
 ros2 launch factory_delivery_amr_description display.launch.py
 
-# 2. Chạy mô phỏng vật lý đầy đủ trong nhà máy với Gazebo Fortress (2 robot amr_1 & amr_2):
+# 2. Chạy mô phỏng vật lý đầy đủ trong nhà máy với Gazebo Fortress (mặc định 1 robot amr_1 tại (0, 0)):
 source install/setup.bash
 ros2 launch factory_delivery_amr_gazebo gazebo.launch.py
 
+# (Tùy chọn) Bật chế độ 2 robot (amr_1 tại y=+0.8m & amr_2 tại y=-0.8m) hoặc chạy không GUI Gazebo:
+# ros2 launch factory_delivery_amr_gazebo gazebo.launch.py multi_robot:=true
+# ros2 launch factory_delivery_amr_gazebo gazebo.launch.py headless:=true
+
 # 3. Mở một Terminal khác (tại thư mục gốc) để điều khiển Robot di chuyển và nâng/hạ bàn nâng bằng bàn phím:
 source install/setup.bash
-# Điều khiển riêng Xe 1 (hoặc truyền tham số "2" cho Xe 2):
+# Điều khiển riêng Xe 1 (hoặc truyền tham số "2" cho Xe 2 khi bật multi_robot:=true):
 ros2 run factory_delivery_amr_gazebo amr_keyboard_teleop.py 1
 # Hoặc dùng trình điều khiển tổng hợp cả 2 xe trong 1 Terminal:
 # ros2 run factory_delivery_amr_gazebo dual_amr_teleop.py
 
-# 4. Mở RViz2 trực quan hóa toàn bộ cảm biến (Mô hình Robot 3D, tia quét 2D LiDAR, Odometry và trục tọa độ TF):
+# 4. Mở RViz2 trực quan hóa cảm biến thô (chỉ dùng khi KHÔNG mở RViz của SLAM/Nav2):
 source install/setup.bash
 ros2 launch factory_delivery_amr_gazebo rviz_sensors.launch.py
+# (Thêm multi_robot:=true nếu Gazebo đang bật 2 robot)
 ```
 
 #### Bước 5: Kiểm tra và Test toàn bộ Topic Cảm biến & Điều khiển qua ROS 2 CLI
@@ -1525,7 +1563,7 @@ ros2 topic pub /amr_1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.5, y: 0.0,
 ros2 topic pub /amr_1/lift_command std_msgs/msg/Float64 "{data: 0.20}" --once
 ```
 
-#### Bước 6: Hướng dẫn quan sát trực quan 2 Robot trên RViz2
+#### Bước 6: Hướng dẫn quan sát trực quan Robot & Cảm biến trên RViz2 (không Nav2)
 
 Sau khi khởi chạy file hiển thị:
 ```bash
@@ -1534,17 +1572,49 @@ ros2 launch factory_delivery_amr_gazebo rviz_sensors.launch.py
 ```
 
 Cửa sổ **RViz2** sẽ hiển thị:
-1. **Khung nhìn chuẩn (`Fixed Frame: world`)**: Toàn bộ hệ tọa độ nhà kho được căn chỉnh với mặt sàn và 2 robot đặt song song tại $y = \pm 0.8\text{ m}$.
-2. **RobotModel 1 & 2**: Mô hình 3D chi tiết của cả 2 robot AMR (/amr_1 và /amr_2) di chuyển thời gian thực.
-3. **LaserScan 1 & 2**:
+1. **Khung nhìn chuẩn (`Fixed Frame: world`)**: Toàn bộ hệ tọa độ nhà kho được căn chỉnh với mặt sàn (`amr_1` tại tâm `(0, 0)`, hoặc $y = \pm 0.8\text{ m}$ khi chạy `multi_robot:=true`).
+2. **RobotModel 1 (& 2)**: Mô hình 3D chi tiết của robot AMR (`/amr_1` và `/amr_2`) di chuyển thời gian thực.
+3. **LaserScan 1 (& 2)**:
    - `LaserScan 1 (/amr_1/scan)`: Tia quét 360 độ màu **Xanh lá cây** phản xạ trên tường kho và kệ hàng.
-   - `LaserScan 2 (/amr_2/scan)`: Tia quét 360 độ màu **Xanh Cyan** của robot thứ 2.
-4. **Odometry 1 & 2**: Mũi tên đỏ và xanh lam thể hiện vector vận tốc và quỹ đạo di chuyển của từng xe.
+   - `LaserScan 2 (/amr_2/scan)`: Tia quét 360 độ màu **Xanh Cyan** của robot thứ 2 (khi bật `multi_robot:=true`).
+4. **Odometry 1 (& 2)**: Mũi tên đỏ và xanh lam thể hiện vector vận tốc và quỹ đạo di chuyển của từng xe.
 5. **Thao tác chuột**:
    - **Xoay 3D**: Giữ chuột trái và kéo.
    - **Zoom**: Lăn con lăn chuột giữa (hoặc giữ chuột phải).
    - **Pan (trượt)**: Giữ phím `Shift` + chuột trái (hoặc đè con lăn chuột).
    - **Focus**: Bấm phím `F` trên bàn phím để căn giữa góc nhìn vào robot.
+
+#### Bước 7: Tự hành hoàn toàn với SLAM (`slam_toolbox`) & Nav2 trên RViz2
+
+1. **Tự hành trực tiếp với bản đồ có sẵn (`warehouse_map`) và chọn điểm trên RViz2:**
+   - **Terminal 1 (Gazebo 1 robot `amr_1`):**
+     ```bash
+     source install/setup.bash
+     ros2 launch factory_delivery_amr_gazebo gazebo.launch.py
+     ```
+   - **Terminal 2 (Nav2 + Map Server + AMCL + RViz2 Navigation):**
+     ```bash
+     source install/setup.bash
+     ros2 launch factory_delivery_amr_navigation navigation.launch.py
+     ```
+   - **Thao tác trên RViz2:**
+     1. Bấm nút **`2D Pose Estimate`** trên thanh toolbar trên cùng $\rightarrow$ click vào **tâm lưới `(0, 0)`** trên bản đồ và kéo mũi tên chỉ hướng **sang phải (`+X`)** để gán vị trí ban đầu cho `amr_1` (topic `/amr_1/initialpose`). Lưu ý trong panel **Navigation 2**, cả `Navigation: active` và `Localization: active` đều chuyển sang trạng thái hoạt động.
+     2. Bấm nút **`Nav2 Goal`** $\rightarrow$ click và kéo chọn hướng tại điểm đến mong muốn trên bản đồ. Robot tự tính đường đi (`Global Plan`), tránh tường/kệ hàng/trạm sạc (`Local Costmap` + `DWBLocalPlanner`) và tự động xoay/tiến về đích.
+
+2. **(Tùy chọn) Tự quét lại bản đồ SLAM hoặc chạy kịch bản giao hàng tự động:**
+   ```bash
+   # Quét bản đồ nhà kho mới bằng slam_toolbox (chạy sau gazebo.launch.py, kết hợp teleop):
+   source install/setup.bash
+   ros2 launch factory_delivery_amr_navigation slam.launch.py
+
+   # Ở một terminal khác, lưu bản đồ vừa quét vào src/factory_delivery_amr_navigation/maps/:
+   source install/setup.bash
+   ros2 run factory_delivery_amr_navigation save_warehouse_map.py
+
+   # Hoặc chạy demo nhiệm vụ tự động (tự set initialpose tại (0,0), đi lấy/trả hàng & nâng bàn nâng):
+   source install/setup.bash
+   ros2 run factory_delivery_amr_navigation autonomous_mission.py amr_1
+   ```
 
 ---
 

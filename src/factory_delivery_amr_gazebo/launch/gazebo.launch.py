@@ -6,15 +6,32 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch.actions import AppendEnvironmentVariable
+from launch.actions import DeclareLaunchArgument
 from launch.actions import ExecuteProcess
 from launch.actions import IncludeLaunchDescription
 from launch.actions import TimerAction
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import Command
+from launch.substitutions import LaunchConfiguration
+from launch.substitutions import PythonExpression
 
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
+    declare_headless = DeclareLaunchArgument(
+        "headless",
+        default_value="false",
+        description="Run Gazebo Sim in headless server-only mode (-s) if true",
+    )
+    declare_multi_robot = DeclareLaunchArgument(
+        "multi_robot",
+        default_value="false",
+        description="Spawn second robot amr_2 in addition to amr_1 if true",
+    )
+    multi_robot = LaunchConfiguration("multi_robot")
     package_name = "factory_delivery_amr_gazebo"
     description_package_name = "factory_delivery_amr_description"
 
@@ -93,6 +110,7 @@ def generate_launch_description():
     )
 
     generate_urdf_2 = ExecuteProcess(
+        condition=IfCondition(multi_robot),
         cmd=[
             "xacro",
             xacro_file,
@@ -114,6 +132,10 @@ def generate_launch_description():
     #   Print detailed Gazebo diagnostic output.
     # ========================================================================
 
+    gz_args_flag = PythonExpression(
+        ["'-s -r -v 4 ' if '", LaunchConfiguration("headless"), "'.lower() == 'true' else '-r -v 4 '"]
+    )
+
     start_gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -123,10 +145,7 @@ def generate_launch_description():
             )
         ),
         launch_arguments={
-            "gz_args": (
-                "-r -v 4 " +
-                world_file
-            ),
+            "gz_args": [gz_args_flag, world_file],
             "on_exit_shutdown": "true",
         }.items(),
     )
@@ -169,10 +188,14 @@ def generate_launch_description():
 
 
     # ========================================================================
-    # SPAWN TWO ROBOTS (amr_1 & amr_2) INTO GAZEBO
-    #   - amr_1 at (0.0, +0.8, 0.01)
-    #   - amr_2 at (0.0, -0.8, 0.01)
+    # SPAWN ROBOTS INTO GAZEBO
+    #   - Single robot default (multi_robot:=false): amr_1 at (0.0, 0.0, 0.01)
+    #   - Dual robot (multi_robot:=true): amr_1 at (0.0, +0.80), amr_2 at (0.0, -0.80)
     # ========================================================================
+
+    amr_1_spawn_y = PythonExpression(
+        ["'0.80' if '", multi_robot, "'.lower() == 'true' else '0.0'"]
+    )
 
     spawn_robot_1 = TimerAction(
         period=6.5,
@@ -192,7 +215,7 @@ def generate_launch_description():
                     "-x",
                     "0.0",
                     "-y",
-                    "0.80",
+                    amr_1_spawn_y,
                     "-z",
                     "0.01",
                 ],
@@ -202,6 +225,7 @@ def generate_launch_description():
 
     spawn_robot_2 = TimerAction(
         period=7.5,
+        condition=IfCondition(multi_robot),
         actions=[
             Node(
                 package="ros_gz_sim",
@@ -227,7 +251,7 @@ def generate_launch_description():
     )
 
     # ========================================================================
-    # LIFT AND SCISSOR SYNCHRONIZATION CONTROLLERS FOR BOTH ROBOTS
+    # LIFT AND SCISSOR SYNCHRONIZATION CONTROLLERS
     # ========================================================================
 
     lift_controller_amr_1 = TimerAction(
@@ -240,7 +264,7 @@ def generate_launch_description():
                 output="screen",
                 parameters=[
                     {
-                        "use_sim_time": True,
+                        "use_sim_time": False,
                         "topic_prefix": "/amr_1",
                     }
                 ],
@@ -250,6 +274,7 @@ def generate_launch_description():
 
     lift_controller_amr_2 = TimerAction(
         period=9.2,
+        condition=IfCondition(multi_robot),
         actions=[
             Node(
                 package=package_name,
@@ -258,11 +283,63 @@ def generate_launch_description():
                 output="screen",
                 parameters=[
                     {
-                        "use_sim_time": True,
+                        "use_sim_time": False,
                         "topic_prefix": "/amr_2",
                     }
                 ],
             )
+        ],
+    )
+
+    # ========================================================================
+    # ROBOT STATE PUBLISHERS (TF TREE: base_footprint -> base_link -> sensors)
+    # ========================================================================
+
+    robot_description_1 = ParameterValue(
+        Command(["xacro ", xacro_file, " topic_prefix:=/amr_1"]),
+        value_type=str,
+    )
+    robot_description_2 = ParameterValue(
+        Command(["xacro ", xacro_file, " topic_prefix:=/amr_2"]),
+        value_type=str,
+    )
+
+    rsp_node_1 = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher_amr_1",
+        namespace="amr_1",
+        output="screen",
+        parameters=[
+            {
+                "robot_description": robot_description_1,
+                "frame_prefix": "amr_1/",
+                "use_sim_time": True,
+            }
+        ],
+        remappings=[
+            ("/tf", "/tf"),
+            ("/tf_static", "/tf_static"),
+        ],
+    )
+
+    rsp_node_2 = Node(
+        condition=IfCondition(multi_robot),
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher_amr_2",
+        namespace="amr_2",
+        output="screen",
+        parameters=[
+            {
+                "robot_description": robot_description_2,
+                "frame_prefix": "amr_2/",
+                "use_sim_time": True,
+            }
+        ],
+        remappings=[
+            ("/tf", "/tf"),
+            ("/tf_static", "/tf_static"),
         ],
     )
 
@@ -272,6 +349,8 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
+            declare_headless,
+            declare_multi_robot,
             set_ign_resource_path,
             set_gz_resource_path,
             set_sdf_path,
@@ -279,6 +358,8 @@ def generate_launch_description():
             generate_urdf_2,
             start_gazebo,
             bridge,
+            rsp_node_1,
+            rsp_node_2,
             spawn_robot_1,
             spawn_robot_2,
             lift_controller_amr_1,

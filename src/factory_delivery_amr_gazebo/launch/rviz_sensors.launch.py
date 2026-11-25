@@ -5,13 +5,36 @@ import os
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition
 from launch.substitutions import Command
+from launch.substitutions import LaunchConfiguration
+from launch.substitutions import PythonExpression
 
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
+    declare_launch_rsp = DeclareLaunchArgument(
+        "launch_rsp",
+        default_value="false",
+        description="Launch robot_state_publisher nodes here if not started by gazebo.launch.py",
+    )
+    declare_static_world_tf = DeclareLaunchArgument(
+        "use_static_world_tf",
+        default_value="true",
+        description="Publish static world->odom transforms (disable when SLAM/AMCL is active)",
+    )
+    declare_multi_robot = DeclareLaunchArgument(
+        "multi_robot",
+        default_value="false",
+        description="Match dual-robot spawn offsets (y=+-0.80) if true, else single robot at (0,0)",
+    )
+
+    launch_rsp = LaunchConfiguration("launch_rsp")
+    use_static_world_tf = LaunchConfiguration("use_static_world_tf")
+    multi_robot = LaunchConfiguration("multi_robot")
     package_name = "factory_delivery_amr_gazebo"
     description_package_name = "factory_delivery_amr_description"
 
@@ -67,6 +90,7 @@ def generate_launch_description():
     # ========================================================================
 
     rsp_node_1 = Node(
+        condition=IfCondition(launch_rsp),
         package="robot_state_publisher",
         executable="robot_state_publisher",
         name="robot_state_publisher_amr_1",
@@ -86,6 +110,11 @@ def generate_launch_description():
     )
 
     rsp_node_2 = Node(
+        condition=IfCondition(
+            PythonExpression(
+                ["'", launch_rsp, "'.lower() == 'true' and '", multi_robot, "'.lower() == 'true'"]
+            )
+        ),
         package="robot_state_publisher",
         executable="robot_state_publisher",
         name="robot_state_publisher_amr_2",
@@ -106,12 +135,42 @@ def generate_launch_description():
 
     # ========================================================================
     # STATIC TRANSFORMS FROM WORLD TO EACH ROBOT'S ODOM FRAME
-    # Places both robots at their respective spawn positions in RViz space
-    #   - amr_1: (0.0, +0.8, 0.0)
-    #   - amr_2: (0.0, -0.8, 0.0)
+    # Places robots at their respective spawn positions in RViz space:
+    #   - Single robot (multi_robot:=false): amr_1 at (0.0, 0.0, 0.0)
+    #   - Dual robot (multi_robot:=true):    amr_1 at (0.0, +0.8), amr_2 at (0.0, -0.8)
     # ========================================================================
 
-    static_tf_world_to_odom_1 = Node(
+    static_tf_world_to_odom_1_single = Node(
+        condition=IfCondition(
+            PythonExpression(
+                [
+                    "'",
+                    use_static_world_tf,
+                    "'.lower() == 'true' and '",
+                    multi_robot,
+                    "'.lower() != 'true'",
+                ]
+            )
+        ),
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_tf_world_to_odom_1",
+        arguments=["0", "0", "0", "0", "0", "0", "world", "amr_1/odom"],
+        parameters=[{"use_sim_time": True}],
+    )
+
+    static_tf_world_to_odom_1_dual = Node(
+        condition=IfCondition(
+            PythonExpression(
+                [
+                    "'",
+                    use_static_world_tf,
+                    "'.lower() == 'true' and '",
+                    multi_robot,
+                    "'.lower() == 'true'",
+                ]
+            )
+        ),
         package="tf2_ros",
         executable="static_transform_publisher",
         name="static_tf_world_to_odom_1",
@@ -120,6 +179,17 @@ def generate_launch_description():
     )
 
     static_tf_world_to_odom_2 = Node(
+        condition=IfCondition(
+            PythonExpression(
+                [
+                    "'",
+                    use_static_world_tf,
+                    "'.lower() == 'true' and '",
+                    multi_robot,
+                    "'.lower() == 'true'",
+                ]
+            )
+        ),
         package="tf2_ros",
         executable="static_transform_publisher",
         name="static_tf_world_to_odom_2",
@@ -146,9 +216,13 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
+            declare_launch_rsp,
+            declare_static_world_tf,
+            declare_multi_robot,
             rsp_node_1,
             rsp_node_2,
-            static_tf_world_to_odom_1,
+            static_tf_world_to_odom_1_single,
+            static_tf_world_to_odom_1_dual,
             static_tf_world_to_odom_2,
             rviz_node,
         ]
