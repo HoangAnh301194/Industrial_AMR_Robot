@@ -11,6 +11,7 @@ from launch.actions import SetEnvironmentVariable
 from launch.actions import TimerAction
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
+from launch.substitutions import PythonExpression
 from launch_ros.actions import Node
 from launch_ros.actions import PushRosNamespace
 from launch_ros.descriptions import ParameterFile
@@ -111,9 +112,16 @@ def generate_launch_description():
         allow_substs=True,
     )
 
+    scan_color = PythonExpression(
+        ["'255; 80; 0' if '", robot_ns, "' == 'amr_2' else '0; 255; 100'"]
+    )
+
     configured_rviz_config = ReplaceString(
         source_file=rviz_config_template,
-        replacements={"<robot_namespace>": ("/", robot_ns)},
+        replacements={
+            "<robot_namespace>": ("/", robot_ns),
+            "<scan_color>": scan_color,
+        },
     )
 
     # Global Map Server (publishes /map shared across robots)

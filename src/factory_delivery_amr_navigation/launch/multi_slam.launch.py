@@ -106,11 +106,7 @@ def generate_launch_description():
         ],
     )
 
-    rviz_config_template = os.path.join(pkg_share, "rviz", "navigation.rviz")
-    configured_rviz_config = ReplaceString(
-        source_file=rviz_config_template,
-        replacements={"<robot_namespace>": "/amr_1"},
-    )
+    rviz_config_file = os.path.join(pkg_share, "rviz", "multi_slam.rviz")
 
     rviz_node = Node(
         condition=IfCondition(use_rviz),
@@ -118,7 +114,7 @@ def generate_launch_description():
         executable="rviz2",
         name="rviz2_multi_slam",
         output="screen",
-        arguments=["-d", configured_rviz_config],
+        arguments=["-d", rviz_config_file],
         parameters=[{"use_sim_time": use_sim_time}],
     )
 
