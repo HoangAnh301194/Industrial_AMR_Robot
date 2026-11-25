@@ -69,6 +69,7 @@ def generate_launch_description():
         replacements={
             "<robot_namespace>": ("/", robot_ns),
             "<scan_color>": scan_color,
+            "<tf_prefix>": robot_ns,
         },
     )
 

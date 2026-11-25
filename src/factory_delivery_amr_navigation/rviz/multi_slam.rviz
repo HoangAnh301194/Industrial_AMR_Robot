@@ -55,7 +55,7 @@ Visualization Manager:
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
       Name: RobotModel 1 (amr_1)
-      TF Prefix: ""
+      TF Prefix: amr_1
       Update Interval: 0
       Value: true
       Visual Enabled: true
@@ -78,7 +78,7 @@ Visualization Manager:
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
       Name: RobotModel 2 (amr_2)
-      TF Prefix: ""
+      TF Prefix: amr_2
       Update Interval: 0
       Value: true
       Visual Enabled: true

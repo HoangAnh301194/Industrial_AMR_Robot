@@ -64,7 +64,7 @@ Visualization Manager:
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
       Name: RobotModel
-      TF Prefix: ""
+      TF Prefix: <tf_prefix>
       Update Interval: 0
       Value: true
       Visual Enabled: true
