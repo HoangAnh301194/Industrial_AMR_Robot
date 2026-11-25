@@ -11,9 +11,10 @@ slam_toolbox:
 
     # ROS Frames & Topics (templated per robot namespace)
     odom_frame: <robot_ns>/odom
-    map_frame: map
+    map_frame: <map_frame>
     base_frame: <robot_ns>/base_footprint
     scan_topic: /<robot_ns>/scan
+    map_name: <map_name>
     use_map_saver: true
     mode: mapping
 

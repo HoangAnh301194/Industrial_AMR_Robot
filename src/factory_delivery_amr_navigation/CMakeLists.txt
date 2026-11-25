@@ -24,6 +24,7 @@ install(
 install(
   PROGRAMS
     scripts/autonomous_mission.py
+    scripts/multi_robot_map_merge.py
     scripts/save_warehouse_map.py
   DESTINATION lib/${PROJECT_NAME}
 )

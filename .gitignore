@@ -2,6 +2,8 @@ build/
 install/
 log/
 tmp/
+__pycache__/
+*.pyc
 
 # LaTeX build artifacts
 *.aux

@@ -9,7 +9,9 @@ from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.descriptions import ParameterFile
 from nav2_common.launch import ReplaceString
+from nav2_common.launch import RewrittenYaml
 
 
 def generate_launch_description():
@@ -38,9 +40,23 @@ def generate_launch_description():
     slam_params_template = os.path.join(pkg_share, "config", "slam_toolbox_params.yaml")
     rviz_config_template = os.path.join(pkg_share, "rviz", "navigation.rviz")
 
-    configured_slam_params = ReplaceString(
+    replaced_slam_params = ReplaceString(
         source_file=slam_params_template,
-        replacements={"<robot_ns>": robot_ns},
+        replacements={
+            "<robot_ns>": robot_ns,
+            "<map_frame>": "map",
+            "<map_name>": "/map",
+        },
+    )
+
+    configured_slam_params = ParameterFile(
+        RewrittenYaml(
+            source_file=replaced_slam_params,
+            root_key=robot_ns,
+            param_rewrites={"use_sim_time": use_sim_time},
+            convert_types=True,
+        ),
+        allow_substs=True,
     )
 
     configured_rviz_config = ReplaceString(
@@ -52,10 +68,12 @@ def generate_launch_description():
         package="slam_toolbox",
         executable="async_slam_toolbox_node",
         name="slam_toolbox",
+        namespace=robot_ns,
         output="screen",
-        parameters=[
-            configured_slam_params,
-            {"use_sim_time": use_sim_time},
+        parameters=[configured_slam_params],
+        remappings=[
+            ("map", "/map"),
+            ("map_metadata", "/map_metadata"),
         ],
     )
 
